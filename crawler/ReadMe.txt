@@ -39,7 +39,7 @@ procedure to run the crawler :
 
 
 1) To launch the crawler:
-   1.1) Open the command prompt/shell and navigate to the path where you have extracted the zip file and type the following command
+   1.1) Open the command prompt/shell and navigate to the crawler folder and type the following command
    1.2) python Launcher.py <url> <maxlinks> [max-links is optional]
         Eg 1: python Launcher.py http://python.org 50
 	Eg 1: python Launcher.py http://python.org
