@@ -1,0 +1,28 @@
+<html>
+<head/>
+<link rel="stylesheet" href="chosen.css" />
+<body>
+
+	<div id='mdiv'/>
+    
+	<script type="text/template" id="movie-template">
+		<select data-placeholder="Select a movie" style="width:350px;" class="chzn-select12" tabindex="5" id="moviesList">
+			<option/>
+			<% _.each(movielist, function(m) { %> 
+				<optgroup label="<%= m.language %>">
+					<% _.each(m.movies, function(movie) { %> 
+						<option><%= movie %></option>
+					<% }); %>
+				</optgroup>	
+			<% }); %>
+		</select>
+	</script>
+  
+	<script src="jquery.min.js" type="text/javascript"></script>
+	<script src="underscore-min.js" type="text/javascript"></script>
+	<script src="backbone-min.js" type="text/javascript"></script>
+	<script src="chosen.jquery.min.js" type="text/javascript"></script>
+	<script src="film.js" type="text/javascript"></script>
+	 
+</body>
+</html>
