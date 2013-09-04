@@ -1,4 +1,4 @@
-It's an interesting problem on graphs asked in the ACM ICPC finals. Find the problem in the problem folder.
+It's an interesting problem on graphs asked in the ACM ICPC. Find the problem in the problem folder.
 
 
 
