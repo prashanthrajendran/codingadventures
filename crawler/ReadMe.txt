@@ -50,3 +50,8 @@ procedure to run the crawler :
 ###########NOTE : MULTIPROCESSING IS NOT SUPPORTED######################
 
 (i.e) if you execute Launcher.py from two command prompt/shell at the same time you won't get expected behaviour
+
+
+ISSUES TO FIX FOR LATER COMMITS:
+
+The logic for removing the mutiprocessing is not proper, it will be fixed in later commits 
