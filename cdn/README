@@ -1,0 +1,85 @@
+High Level Approach:
+--------------------
+HTTPServer(HttpServer.py) : It uses python's built in HTTPServer component and overrides the GET method implementation to handle 
+project's specific requirements such fetching contents from origin server and storing it in cache.
+
+DnsServer (DnsServer.py) : It uses python's built in UDPServer and overrides the handler responsible for handling the incoming data 
+and sending the reply, so that DNS packets can be constructed and replied.
+
+Probing Server (probe.py) : Run on the replica server and responsible for returning rtt between the server and the given ip.
+It uses python's built in TCP server 
+
+replica.py : part of DNS server responsible for choosing the best replica for the client 
+
+Challenges :
+----------- 
+1. Testing HTTPServer was a challenging part. we wrote a separate test code to hit the HTTPServer will parallel requests.
+2. Encoding the host name form the DNS packet was the challenging part in dns. It can't be unpacked directly as there is 
+   no fixed length. Same applies for packing the host name for the response packet.
+3. Optimizing time required for replica selection
+
+Memory Limit :
+------------
+Handling of storage limit (10 MB in cache of ec2 server): 
+page hits and contents of the page both are stored in hard drive. Hence, in case of ec2 servers
+more than 10MB of contents can't be stored. What ever is being stored in the hard drive is loaded
+to RAM for performance. As contents in hard drive in less than or equal to 10 MB the contents in
+the RAM also cannot exceed 10 MB.
+
+Optimization:
+------------
+1. HTTPserver uses cache to store the contents fetched form the origin server and Least Frequently Used
+   cache replacement policy to replace the pages when the cache is full
+2. DNS server returns the ip of the replica server which is closer to the client. location of the client
+   is determined by web service exposed by telize.com. IF THIS WEBSERVICE IS DOWN THEN RANDOM IP WILL BE 
+   RETURNED.
+ 3. Best replica server is chosen based on the RTT between the server and client.
+
+   
+Approach for choosing the replica server:
+----------------------------------------
+
+1. In each replicas the server apart from the HTTPServer another probe server will be running. The job of the
+   probing server is given an ip it will return the rtt between the server and ip.
+    
+2. Once DNS service receives the ip of the client it passes the ip to the replica.py which is responsible for
+   choosing the best replica server for the given ip
+   
+3. Given an ip for the first time the replica.py will return the geographically closest replica and add the replica
+   server to the queue. When ever an ip is added to the Queue a thread will pick that ip and send it to probe server
+   running inside the replica server to calculate the rtt. It will send the client ip to the replica server in 10
+   different threads and chooses the server which returns the minimum rtt as the best replica for the client's ip
+   and stores value in dictionary
+
+4. If a particular client querying the DNS server is not the first time and then the best server value is automatically
+   picked from the cache and returned.
+
+
+Design decisions:
+-----------------
+
+1. calculating the rtts from all the replicas using threads : We initially developed a sequential version to 
+   measure the rtt of the client from all the replicas it took 900 ms to complete all the measurement.
+   when we measured each rtt in a thread the total time took around 300 ms.
+
+2. Having a separate server in replicas to measure rtt : This decision was to reduce the load on HTTPServer and also
+   not to modify the HTTP Server code.
+ 
+3. choosing geographically close server Vs replica with minimum rtt : If we had to calculate the best replica using rtt
+   the response time for client was 300 ms (including the rtt between client and DNS) more than calculating 
+   the geographically close replica. So for the first request from the client we return the geographically closest
+   replica and calculate the rtt after that using back ground thread.
+
+4. When DNS is started we establish TCP connection between replica.py (mapper code) and each replicas and we store the 
+   sockets in cache. When we need to contact replica servers to measure RTT, we use the socket connection we have stored
+   in the cache. This approach reduced the time taken to calculate rtt from all the replicas.   
+
+
+If we had more time we would have improved the download time of the content from the replica server, For example 
+lets say we have two replica servers (R1 and R2). The RTT between R1 and R2 is less compared to RTT between R1 and Origin server. 
+If R1 does not have requested content, and R2 has the content in its cache, then we request content from R1 instead of origin to 
+get the content faster, which will improve the download time and respond faster to the client. To handle this scenario 
+we would have used a logical server that will probe each replica to know what all contents are present and also RTT between the two.
+
+
+ 

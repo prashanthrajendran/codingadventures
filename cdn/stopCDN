@@ -1,0 +1,26 @@
+replicas=( 54.174.6.90 54.149.9.25 54.67.86.61 54.72.167.104 54.93.182.67 54.169.146.226 54.65.104.220 54.66.212.131 54.94.156.232 )
+#replicas=( ec2-54-174-6-90.compute-1.amazonaws.com ec2-54-149-9-25.us-west-2.compute.amazonaws.com)
+#http://wiki.bash-hackers.org/howto/getopts_tutorial
+while getopts ":p:o:n:u:i:" opt; do
+  case $opt in
+    u) username=$OPTARG ;;
+    i) keyfile=$OPTARG ;;
+   	p) ;;
+   	o) ;;
+   	n) ;;
+   \?)
+      echo "Invalid option"
+      exit 1
+      ;;
+  esac
+done
+
+for replica in "${replicas[@]}";
+do
+	ssh -i $keyfile $username@$replica 'killall python'
+	#ssh -i $keyfile $username@$replica 'pkill -f HttpServer.py'
+	#ssh -i $keyfile $username@$replica 'pkill -f probe.py' 
+done;
+
+ssh -i $keyfile $username@cs5700cdnproject.ccs.neu.edu 'killall python'
+#ssh -i $keyfile $username@cs5700cdnproject.ccs.neu.edu 'pkill -f DnsServer.py'

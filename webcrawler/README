@@ -1,0 +1,37 @@
+Approach:
+--------
+
+our code
+
+1. directly hits the login url using GET Request
+2. reads the cookie(csrf token and session id) form the login page response
+3. uses the user name, password, csrf token as data and sends POST request with the session id retrieved earlier to login and get the home page
+4. crawls all the login inside from the home page of the user and searches for the flag, collects it when it finds one. (used beautifulsoap for parsin)
+5. uses BFS for crawling
+6. uses a set known as crawledurls to store the crawled urls , to avoid loops
+7. prints all 5 flags once they are collected
+
+
+Challenges :
+-----------
+
+1. To understand the working of HTTP we had to inspect the browser's network activity and it took some time to get some sense out of it.
+2. Once we understood the working of HTTP we were able to get the login page using GET request easily, but POST request didn't work and with
+   the server response code we couldn't guess where we are going wrong. Then we wrote a django application in our localhost which accepts two strings
+   as POST request and responds some data. We sent POST request from our code to this application and tried to get response. we were easily able to
+   trouble shoot in our localhost as we had server log files which we didn't have for fakebook. Once we successfully got response for our POST request
+   from the localhost, we made sure our approach is working and used the same approach in fakebook to login.
+3. We were using HTTP 1.1 and as we were not able to maintain the persistent connectivity, we were establishing the socket connection each time. It was taking
+   nearly 5 hrs for us to collect all the flags. But HTTP 1.1 seems to be very slow if we establish the connection each time, but HTTP 1.0 seems very fast
+   for the scenario of establishing connection each and every time. So once we changed the version of HTTP to 1.0 the running time came to ~7 mins.
+   (Thanks to TA for pointing out to change the HTTP version to 1.0)
+
+Test:
+----
+
+1. Since fakebook seems to contain huge number of links its almost impossible to test it on fakebook as it takes tremendous amount of time 
+   to get flag. So we had two html pages with each of them having a link to each other and one of them had flags, deployed them using python's SimpleHTTP server 
+   and issued GET requests from crawler and checked whether it is parsing the flags and detecting the loops. Once we found that we are successful in
+   this basic testing we ran our crawler on the server.
+ 2. We also had public domain inside the sample html and tested whether crawler is ignoring the public domain
+ 
