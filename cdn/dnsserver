@@ -1,2 +1,0 @@
-python DnsServer.py $@
-python replica.py
