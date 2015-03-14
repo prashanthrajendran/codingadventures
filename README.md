@@ -1,16 +1,3 @@
-codingadventures
-================
-
-Below is the categorization of projects in my repository  
-
-Academic projects:
------------------
-1. cdn
-2. rawhttpget
-3. webcrawler
-
-Hobby projects:
----------------
-1. SindbadSolver
-2. crawler
-3. Django & Backbone.js
+1. SindbadSolver - solution to a ACM ICPC problem
+2. crawler - a basic crawler
+3. Django & Backbone.js - basic ticket booking app using backbone.js
